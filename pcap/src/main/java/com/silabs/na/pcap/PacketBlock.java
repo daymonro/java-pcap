@@ -27,26 +27,36 @@ import com.silabs.na.pcap.util.ByteArrayUtil;
  */
 public class PacketBlock {
 
+  private final int interfaceId;
   private final long nanoseconds;
   private final byte[] data;
 
   /**
    * Creates a new packet block with given timestamp and data.
    *
-   * @param nanoseconds
-   *          Timestamp.
-   * @param data
-   *          Data inside this packet.
+   * @param nanoseconds Timestamp.
+   * @param data        Data inside this packet.
    */
   public PacketBlock(final long nanoseconds, final byte[] data) {
+    this(0, nanoseconds, data);
+  }
+
+  /**
+   * Creates a new packet block with given interfaceId, timestamp and data.
+   *
+   * @param interfaceId Interface id. 0 for default, if none is available.
+   * @param nanoseconds Timestamp.
+   * @param data        Data inside this packet.
+   */
+  public PacketBlock(final int interfaceId, final long nanoseconds, final byte[] data) {
+    this.interfaceId = interfaceId;
     this.nanoseconds = nanoseconds;
     this.data = data;
   }
 
   @Override
   public String toString() {
-    return String
-        .format("%d ns: %s", nanoseconds, ByteArrayUtil.formatByteArray(data));
+    return String.format("%d ns: %s", nanoseconds, ByteArrayUtil.formatByteArray(data));
   }
 
   /**
@@ -59,9 +69,17 @@ public class PacketBlock {
   }
 
   /**
-   * Returns time in nanosecond precision. It is possible to return
-   * Lang.MIN_VALUE in case of simple packet block which does not contain
-   * timestamp.
+   * Interface Id.
+   * 
+   * @return int interface id.
+   */
+  public int interfaceId() {
+    return interfaceId;
+  }
+
+  /**
+   * Returns time in nanosecond precision. It is possible to return Lang.MIN_VALUE
+   * in case of simple packet block which does not contain timestamp.
    *
    * @return nanoseconds
    */

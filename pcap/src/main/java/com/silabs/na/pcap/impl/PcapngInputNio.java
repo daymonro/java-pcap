@@ -126,8 +126,7 @@ public class PcapngInputNio implements IPcapInput {
     minor = BufferUtil.readNByteIntFromChannel(rbc, buffer, 2);
 
     byte[] sectionLen = BufferUtil.readBytesFromChannel(rbc, buffer, 8);
-    int sectionLength = ByteArrayUtil
-        .byteArrayToInt(sectionLen, 0, 8, bigEndian);
+    int sectionLength = ByteArrayUtil.byteArrayToInt(sectionLen, 0, 8, bigEndian);
 
     // Total lengh is ENTIRE BLOCK, including the type and the 2 copies
     // of the length and so on.
@@ -144,8 +143,7 @@ public class PcapngInputNio implements IPcapInput {
     // And jump over final length
     skip(4);
 
-    SectionHeaderBlock shb = new SectionHeaderBlock(bigEndian, major, minor,
-                                                    sectionLength);
+    SectionHeaderBlock shb = new SectionHeaderBlock(bigEndian, major, minor, sectionLength);
 
     return new Block(BlockType.SECTION_HEADER_BLOCK, shb, opts);
   }
@@ -181,8 +179,7 @@ public class PcapngInputNio implements IPcapInput {
     return list;
   }
 
-  private Block nextOtherBlock(final int typeCode,
-                               final int totLen) throws IOException {
+  private Block nextOtherBlock(final int typeCode, final int totLen) throws IOException {
     byte[] body;
     if (totLen > 12) {
       body = BufferUtil.readBytesFromChannel(rbc, buffer, totLen - 12);
@@ -204,8 +201,7 @@ public class PcapngInputNio implements IPcapInput {
       opts = readOptions(optLen);
     }
 
-    InterfaceStatisticsBlock isb = new InterfaceStatisticsBlock(interfaceId,
-                                                                timestamp);
+    InterfaceStatisticsBlock isb = new InterfaceStatisticsBlock(interfaceId, timestamp);
     return new Block(BlockType.INTERFACE_STATISTICS_BLOCK, isb, opts);
 
   }
@@ -234,8 +230,7 @@ public class PcapngInputNio implements IPcapInput {
       }
     }
 
-    InterfaceDescriptionBlock idb = new InterfaceDescriptionBlock(LinkType
-        .resolve(linkType), snapLen);
+    InterfaceDescriptionBlock idb = new InterfaceDescriptionBlock(LinkType.resolve(linkType), snapLen);
     return new Block(BlockType.INTERFACE_DESCRIPTION_BLOCK, idb, opts);
   }
 
@@ -287,7 +282,7 @@ public class PcapngInputNio implements IPcapInput {
 
   private Block nextEnhancedPacketBlock(final int totLen) throws IOException {
 
-    BufferUtil.readNByteIntFromChannel(rbc, buffer, 4); // Interface ID
+    int interfaceId = BufferUtil.readNByteIntFromChannel(rbc, buffer, 4); // Interface ID
 
     byte[] timeHighLow = BufferUtil.readBytesFromChannel(rbc, buffer, 8);
     int capturedLength = BufferUtil.readNByteIntFromChannel(rbc, buffer, 4);
@@ -314,7 +309,7 @@ public class PcapngInputNio implements IPcapInput {
 
     long ns = calculateNanoseconds(timeHighLow);
 
-    PacketBlock pb = new PacketBlock(ns, data);
+    PacketBlock pb = new PacketBlock(interfaceId, ns, data);
     return new Block(BlockType.ENHANCED_PACKET_BLOCK, pb, opts);
 
   }
